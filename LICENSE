@@ -19,7 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-The files under assets/ are not covered by this licence. They are measurements
-by others, redistributed under their own terms: see assets/ir/mair/licence.txt
-(CC-BY-4.0) and assets/hrir/sadie2/README.md (Apache-2.0).
