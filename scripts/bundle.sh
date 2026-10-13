@@ -1,7 +1,7 @@
 #!/bin/sh
-# Builds target/Boom3D.app: the release binary, Info.plist and an ad-hoc
-# signature. macOS only asks for the System Audio Recording permission when
-# the app runs from a bundle that declares NSAudioCaptureUsageDescription.
+# Builds target/Boom3D.app: the release binary, Info.plist and a signature.
+# macOS only asks for the System Audio Recording permission when the app runs
+# from a bundle that declares NSAudioCaptureUsageDescription.
 set -eu
 cd "$(dirname "$0")/.."
 
@@ -13,5 +13,14 @@ app=target/Boom3D.app
 mkdir -p "$app/Contents/MacOS"
 cp bundle/Info.plist "$app/Contents/Info.plist"
 cp target/release/boom3d "$app/Contents/MacOS/boom3d"
-codesign --force --sign - "$app"
-echo "built $app"
+
+# Signed with the identity from scripts/make-signing-identity.sh, rebuilds
+# keep their permissions; ad hoc, macOS asks again after every one
+identity="Boom3D Local Signing"
+if security find-identity -v -p codesigning | grep -q "\"$identity\""; then
+	codesign --force --sign "$identity" "$app"
+	echo "built $app, signed with \"$identity\""
+else
+	codesign --force --sign - "$app"
+	echo "built $app, signed ad hoc"
+fi
