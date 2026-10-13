@@ -1,0 +1,21 @@
+[package]
+name = "boom3d"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+assert_no_alloc = "1.1.2"
+ctrlc = { version = "3.5.2", features = ["termination"] }
+fft-convolver = "0.4.0"
+hound = "3.5.1"
+libc = "0.2.190"
+objc2 = "0.6"
+objc2-core-audio = "0.3"
+objc2-core-audio-types = "0.3"
+objc2-core-foundation = "0.3"
+objc2-foundation = "0.3"
+
+# The FFTs are too slow for real time unoptimized; debug builds keep the
+# audio thread's allocation check
+[profile.dev.package."*"]
+opt-level = 3
