@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleIdentifier</key>
-	<string>local.boom3d</string>
+	<string>local.poom3d</string>
 	<key>CFBundleName</key>
-	<string>Boom3D</string>
+	<string>Poom3D</string>
 	<key>CFBundleExecutable</key>
-	<string>boom3d</string>
+	<string>poom3d</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -19,8 +19,8 @@
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSMotionUsageDescription</key>
-	<string>Boom3D follows how your head turns so the concert hall's stage stays in front of you.</string>
+	<string>Poom3D follows how your head turns so the concert hall's stage stays in front of you.</string>
 	<key>NSAudioCaptureUsageDescription</key>
-	<string>Boom3D captures the audio your Mac is playing to add concert hall acoustics to it.</string>
+	<string>Poom3D captures the audio your Mac is playing to add concert hall acoustics to it.</string>
 </dict>
 </plist>

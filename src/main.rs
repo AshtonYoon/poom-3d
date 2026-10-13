@@ -1,4 +1,4 @@
-//! Boom3D: plays the Mac's system audio back through a concert hall.
+//! Poom3D: plays the Mac's system audio back through a concert hall.
 //!
 //! Stage 4 of the roadmap: system audio captured with a process tap is
 //! played from a stage in a hall that stays put when the head turns, and
@@ -56,7 +56,7 @@ const SILENCE: Duration = Duration::from_secs(5);
 /// How long the change from one stage or seat to another takes.
 const FADE_SECONDS: f64 = 0.3;
 
-const ALLOW: &str = "Boom3D needs to be allowed in System Settings > Privacy & Security > \
+const ALLOW: &str = "Poom3D needs to be allowed in System Settings > Privacy & Security > \
                      Screen & System Audio Recording > System Audio Recording Only.";
 
 /// A conservative amount of hall: too much smears the music.
@@ -68,7 +68,7 @@ const DEFAULT_SELECTION: Selection = Selection {
     seat: 0,
 };
 
-const USAGE: &str = "usage: boom3d [--wet LEVEL] [--off] [--probe] [--seconds N]
+const USAGE: &str = "usage: poom3d [--wet LEVEL] [--off] [--probe] [--seconds N]
 
   --wet LEVEL  how much of the hall is heard to start with, from 0 (the stage
                in the open) to 1 (the hall as measured); 0.4 if not given
@@ -175,7 +175,7 @@ fn main() -> ExitCode {
 
     if permission != Permission::Authorized {
         // Starting the tap blocks until the prompt is answered
-        println!("If macOS asks to let Boom3D record system audio, choose Allow.");
+        println!("If macOS asks to let Poom3D record system audio, choose Allow.");
     }
 
     let params = Arc::new(Params::new(args.wet));
@@ -329,7 +329,7 @@ impl Control {
                 if self.stats.cycles.load(Ordering::Relaxed) != watch.cycles {
                     let since = *watch.cycling_since.get_or_insert(now);
                     if self.stats.input_peak.get() > 0.0 {
-                        println!("system audio is passing through Boom3D");
+                        println!("system audio is passing through Poom3D");
                         unheard = None;
                     } else if !watch.warned && now - since >= SILENCE {
                         // A denied tap runs, delivers silence and mutes what it taps

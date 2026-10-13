@@ -1,6 +1,6 @@
 #!/bin/sh
 # Creates a self-signed code-signing identity in your login keychain, for
-# scripts/bundle.sh to sign Boom3D with. Run it once.
+# scripts/bundle.sh to sign Poom3D with. Run it once.
 #
 # With an ad-hoc signature every rebuild is a different app to macOS, which
 # asks for the System Audio Recording permission again each time. Signed with
@@ -11,7 +11,7 @@
 # it, where "Always Allow" keeps it from asking again.
 set -eu
 
-name="Boom3D Local Signing"
+name="Poom3D Local Signing"
 keychain="$HOME/Library/Keychains/login.keychain-db"
 
 if security find-identity -v -p codesigning | grep -q "\"$name\""; then

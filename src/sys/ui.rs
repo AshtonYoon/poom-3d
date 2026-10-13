@@ -30,7 +30,7 @@ define_class!(
     // not implement `Drop`
     #[unsafe(super(NSObject))]
     #[thread_kind = MainThreadOnly]
-    #[name = "Boom3DMenuTarget"]
+    #[name = "Poom3DMenuTarget"]
     #[ivars = Ivars]
     struct MenuTarget;
 
@@ -193,14 +193,14 @@ fn status_item(mtm: MainThreadMarker, menu: &NSMenu) -> Retained<NSStatusItem> {
     if let Some(button) = item.button(mtm) {
         let symbol = NSImage::imageWithSystemSymbolName_accessibilityDescription(
             ns_string!("building.columns"),
-            Some(ns_string!("Boom3D")),
+            Some(ns_string!("Poom3D")),
         );
         match symbol {
             Some(symbol) => {
                 symbol.setTemplate(true);
                 button.setImage(Some(&symbol));
             }
-            None => button.setTitle(ns_string!("Boom3D")),
+            None => button.setTitle(ns_string!("Poom3D")),
         }
     }
     item.setMenu(Some(menu));

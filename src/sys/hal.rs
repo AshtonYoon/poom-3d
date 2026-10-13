@@ -314,7 +314,7 @@ impl Tap {
                 CATapDescription::alloc(),
                 &excluded,
             );
-            description.setName(&NSString::from_str("Boom3D"));
+            description.setName(&NSString::from_str("Poom3D"));
             description.setPrivate(true);
             description.setMuteBehavior(CATapMuteBehavior::MutedWhenTapped);
             check(
@@ -360,7 +360,7 @@ struct Aggregate {
 impl Aggregate {
     fn create(output_uid: &str, tap_uid: &str) -> Result<Self, HalError> {
         let uid = format!(
-            "local.boom3d.aggregate.{}.{}",
+            "local.poom3d.aggregate.{}.{}",
             std::process::id(),
             NEXT_AGGREGATE.fetch_add(1, Ordering::Relaxed),
         );
@@ -374,7 +374,7 @@ impl Aggregate {
             (kAudioSubTapDriftCompensationKey, yes.as_ref()),
         ]);
         let description = dictionary(&[
-            (kAudioAggregateDeviceNameKey, string("Boom3D").as_ref()),
+            (kAudioAggregateDeviceNameKey, string("Poom3D").as_ref()),
             (kAudioAggregateDeviceUIDKey, string(&uid).as_ref()),
             (
                 kAudioAggregateDeviceMainSubDeviceKey,

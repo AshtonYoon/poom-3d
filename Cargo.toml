@@ -1,7 +1,10 @@
 [package]
-name = "boom3d"
+name = "poom3d"
 version = "0.1.0"
 edition = "2024"
+description = "Plays your Mac's audio from a stage in a measured concert hall, with AirPods head tracking"
+license = "MIT"
+repository = "https://github.com/AshtonYoon/poom-3d"
 
 [dependencies]
 assert_no_alloc = "1.1.2"

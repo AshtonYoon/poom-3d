@@ -37,7 +37,7 @@ fn run(params: &Params) {
     let status = unsafe { CMHeadphoneMotionManager::authorizationStatus() };
     if status == CMAuthorizationStatus::Denied || status == CMAuthorizationStatus::Restricted {
         println!(
-            "head tracking: not allowed. Allow Boom3D in System Settings > Privacy & Security > \
+            "head tracking: not allowed. Allow Poom3D in System Settings > Privacy & Security > \
              Motion & Fitness."
         );
         return;
