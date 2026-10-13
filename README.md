@@ -10,8 +10,7 @@ poom3d
 ```
 
 `poom3d` puts an icon in the menu bar. The first time, macOS asks to let it
-record system audio: choose Allow. With AirPods, turn their Spatial Audio off
-in Control Center, since Poom3D does that part itself.
+record system audio
 
 ## References
 
