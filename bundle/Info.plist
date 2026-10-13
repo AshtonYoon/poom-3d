@@ -18,6 +18,8 @@
 	<string>14.2</string>
 	<key>LSUIElement</key>
 	<true/>
+	<key>NSMotionUsageDescription</key>
+	<string>Boom3D follows how your head turns so the concert hall's stage stays in front of you.</string>
 	<key>NSAudioCaptureUsageDescription</key>
 	<string>Boom3D captures the audio your Mac is playing to add concert hall acoustics to it.</string>
 </dict>

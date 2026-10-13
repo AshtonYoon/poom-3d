@@ -1,6 +1,6 @@
 //! What the control thread and the HAL's threads tell each other.
 
-use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
 
 /// Something the control thread has to react to.
 pub enum Event {
@@ -50,12 +50,31 @@ impl AtomicF32 {
     }
 }
 
-/// What the user can change without a new hall being built. Written by the
-/// main thread, read by the audio thread.
+/// What changes while audio is running without a new hall being built.
+/// Written by the main thread unless it says otherwise, read by the audio
+/// thread.
 pub struct Params {
-    /// How much of the output is the hall: 0 is the original sound only, 1 is
-    /// the hall only.
+    /// How much of the hall is heard after the direct sound: 0 is none, 1 is
+    /// the hall as it was measured.
     pub wet: AtomicF32,
+    /// Whether the stage stays put when the head turns.
+    pub tracking: AtomicBool,
+    /// Set to put the stage where the listener is facing now.
+    pub face_stage: AtomicBool,
+    /// How far the head is turned to the left of the stage, in degrees.
+    /// Written by the head tracking thread.
+    pub head_yaw: AtomicF32,
+}
+
+impl Params {
+    pub fn new(wet: f32) -> Self {
+        Self {
+            wet: AtomicF32::new(wet),
+            tracking: AtomicBool::new(true),
+            face_stage: AtomicBool::new(false),
+            head_yaw: AtomicF32::new(0.0),
+        }
+    }
 }
 
 /// Counters written by the audio thread and read by the control thread.

@@ -1,6 +1,6 @@
 //! The menu bar item and its menu. AppKit, so the main thread only.
 
-use std::sync::{Arc, mpsc::Sender};
+use std::sync::{Arc, atomic::Ordering, mpsc::Sender};
 
 use objc2::{
     DefinedClass, MainThreadMarker, MainThreadOnly, define_class, msg_send,
@@ -45,6 +45,18 @@ define_class!(
         #[unsafe(method(wetChanged:))]
         fn wet_changed(&self, slider: &NSSlider) {
             self.ivars().params.wet.set(slider.floatValue());
+        }
+
+        #[unsafe(method(toggleTracking:))]
+        fn toggle_tracking(&self, item: &NSMenuItem) {
+            let tracking = item.state() != NSControlStateValueOn;
+            item.setState(state(tracking));
+            self.ivars().params.tracking.store(tracking, Ordering::Relaxed);
+        }
+
+        #[unsafe(method(faceStage:))]
+        fn face_stage(&self, _item: &NSMenuItem) {
+            self.ivars().params.face_stage.store(true, Ordering::Relaxed);
         }
 
         #[unsafe(method(selectStage:))]
@@ -199,7 +211,8 @@ fn status_item(mtm: MainThreadMarker, menu: &NSMenu) -> Retained<NSStatusItem> {
 /// control thread ends the process.
 ///
 /// `selection` is what the menu starts out showing. Choices made in the menu
-/// go to `events`, except the wet level, which goes straight into `params`.
+/// go to `events`, except the wet level and head tracking, which go straight
+/// into `params`.
 pub fn run(selection: Selection, events: Sender<Event>, params: Arc<Params>) -> ! {
     let mtm = MainThreadMarker::new().expect("the menu runs on the main thread");
     let app = NSApplication::sharedApplication(mtm);
@@ -207,6 +220,7 @@ pub fn run(selection: Selection, events: Sender<Event>, params: Arc<Params>) -> 
     app.setActivationPolicy(NSApplicationActivationPolicy::Accessory);
 
     let wet = params.wet.get();
+    let tracking = params.tracking.load(Ordering::Relaxed);
     let target = MenuTarget::new(mtm, Ivars { events, params });
     let build = Builder {
         mtm,
@@ -226,6 +240,12 @@ pub fn run(selection: Selection, events: Sender<Event>, params: Arc<Params>) -> 
     menu.addItem(&build.choice("무대 폭", stages, selection.stage, sel!(selectStage:)));
     let seats = SEATS.iter().map(|seat| seat.name);
     menu.addItem(&build.choice("좌석", seats, selection.seat, sel!(selectSeat:)));
+
+    menu.addItem(&build.header("머리 방향"));
+    let follow = build.item("헤드트래킹", sel!(toggleTracking:));
+    follow.setState(state(tracking));
+    menu.addItem(&follow);
+    menu.addItem(&build.item("지금 보는 쪽을 정면으로", sel!(faceStage:)));
 
     menu.addItem(&NSMenuItem::separatorItem(mtm));
     menu.addItem(&build.item("종료", sel!(quit:)));

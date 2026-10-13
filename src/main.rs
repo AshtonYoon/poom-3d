@@ -1,15 +1,17 @@
 //! Boom3D: plays the Mac's system audio back through a concert hall.
 //!
-//! Stage 3 of the roadmap: system audio captured with a process tap is
-//! convolved with a hall's impulse responses and mixed with the original,
-//! with the stage width, the seat and the amount of hall chosen from a menu
-//! bar item.
+//! Stage 4 of the roadmap: system audio captured with a process tap is
+//! played from a stage in a hall that stays put when the head turns, and
+//! mixed with the original. The stage width, the seat and the amount of hall
+//! are chosen from a menu bar item.
 //!
 //! The main thread runs the menu. The control thread owns everything Core
 //! Audio and the hall's impulse responses, and is told what to do through
-//! [`Event`]s. The audio thread runs the [`Engine`].
+//! [`Event`]s. The audio thread runs the [`Engine`]. One more thread reads
+//! the headphones' motion.
 
 mod dsp;
+mod head;
 mod ir;
 mod layout;
 mod state;
@@ -31,6 +33,7 @@ use ir::{Library, SEATS, STAGES};
 use state::{AtomicF32, Event, Params, Selection, Stats};
 use sys::{
     hal::{Hal, MAX_FRAMES, Pipeline},
+    motion,
     tcc::{self, Permission},
     ui,
 };
@@ -56,19 +59,19 @@ const FADE_SECONDS: f64 = 0.3;
 const ALLOW: &str = "Boom3D needs to be allowed in System Settings > Privacy & Security > \
                      Screen & System Audio Recording > System Audio Recording Only.";
 
-/// A conservative share of hall: too much smears the music.
+/// A conservative amount of hall: too much smears the music.
 const DEFAULT_WET: f32 = 0.4;
-/// The loudspeakers about 35 degrees to each side, heard from the front.
+/// The narrow stage, heard from the front.
 const DEFAULT_SELECTION: Selection = Selection {
     enabled: true,
-    stage: 1,
+    stage: 0,
     seat: 0,
 };
 
 const USAGE: &str = "usage: boom3d [--wet LEVEL] [--off] [--probe] [--seconds N]
 
-  --wet LEVEL  how much of the output is the hall to start with, from 0 (the
-               original sound only) to 1 (the hall only); 0.4 if not given
+  --wet LEVEL  how much of the hall is heard to start with, from 0 (the stage
+               in the open) to 1 (the hall as measured); 0.4 if not given
   --off        start with the hall turned off, until it's turned on in the menu
   --probe      build the tap and aggregate device, print them, and exit
                without starting audio
@@ -175,9 +178,7 @@ fn main() -> ExitCode {
         println!("If macOS asks to let Boom3D record system audio, choose Allow.");
     }
 
-    let params = Arc::new(Params {
-        wet: AtomicF32::new(args.wet),
-    });
+    let params = Arc::new(Params::new(args.wet));
     let deadline = args
         .seconds
         .map(|seconds| Instant::now() + Duration::from_secs(seconds));
@@ -196,6 +197,7 @@ fn main() -> ExitCode {
         deadline,
     };
     thread::spawn(move || std::process::exit(control.run()));
+    motion::follow_head(params.clone());
 
     ui::run(selection, events, params)
 }
@@ -250,8 +252,8 @@ impl Control {
         let Selection { stage, seat, .. } = self.selection;
         let (library, params) = (&mut self.library, &self.params);
         let started = hal.start(|info| {
-            let responses = library.responses(stage, seat, info.output_rate);
-            let bank = Bank::new(&responses, info.buffer_frames as usize);
+            let hall = library.hall(stage, seat, info.output_rate);
+            let bank = Bank::new(&hall, info.buffer_frames as usize);
             let fade = (FADE_SECONDS * info.output_rate) as usize;
             Engine::new(bank, MAX_FRAMES, fade, params.clone())
         });
@@ -272,8 +274,8 @@ impl Control {
         let Selection { stage, seat, .. } = self.selection;
         println!("stage {}, seat {}", STAGES[stage].name, SEATS[seat].name);
         let info = running.pipeline.info();
-        let responses = self.library.responses(stage, seat, info.output_rate);
-        let bank = Bank::new(&responses, info.buffer_frames as usize);
+        let hall = self.library.hall(stage, seat, info.output_rate);
+        let bank = Bank::new(&hall, info.buffer_frames as usize);
         if running.engine.switch_to(bank).is_err() {
             eprintln!("too many changes are waiting; this one was dropped");
         }

@@ -14,10 +14,17 @@ objc2-app-kit = "0.3"
 objc2-core-audio = "0.3"
 objc2-core-audio-types = "0.3"
 objc2-core-foundation = "0.3"
+objc2-core-motion = "0.3"
 objc2-foundation = "0.3"
 rtrb = "0.4.0"
 
-# The FFTs are too slow for real time unoptimized; debug builds keep the
+# The filters are too slow for real time unoptimized; debug builds keep the
 # audio thread's allocation check
+[profile.dev]
+opt-level = 2
+
 [profile.dev.package."*"]
 opt-level = 3
+
+[build-dependencies]
+hound = "3.5.1"
