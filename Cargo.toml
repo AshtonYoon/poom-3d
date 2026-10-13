@@ -10,10 +10,12 @@ fft-convolver = "0.4.0"
 hound = "3.5.1"
 libc = "0.2.190"
 objc2 = "0.6"
+objc2-app-kit = "0.3"
 objc2-core-audio = "0.3"
 objc2-core-audio-types = "0.3"
 objc2-core-foundation = "0.3"
 objc2-foundation = "0.3"
+rtrb = "0.4.0"
 
 # The FFTs are too slow for real time unoptimized; debug builds keep the
 # audio thread's allocation check

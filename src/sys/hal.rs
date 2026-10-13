@@ -601,12 +601,12 @@ unsafe fn render(
         .engine
         .process(in_left, in_right, out_left, out_right);
 
-    // The device clips what is over full scale; do it here and know about it
-    let mut output_peak = 0.0f32;
-    for sample in out_left.iter_mut().chain(out_right.iter_mut()) {
-        output_peak = output_peak.max(sample.abs());
-        *sample = sample.clamp(-1.0, 1.0);
-    }
+    // Samples over full scale are left to the system, as they are for any
+    // other app: the tap itself delivers them, and the volume comes after
+    let output_peak = out_left
+        .iter()
+        .chain(out_right.iter())
+        .fold(0.0f32, |peak, sample| peak.max(sample.abs()));
     layout::write_first_stereo(&mut device[..first], out_left, out_right);
 
     let input_peak = in_left
@@ -836,10 +836,11 @@ impl Hal {
 
     /// Starts moving system audio from a new tap, through the engine
     /// `engine` builds for the pipeline, to the default output device.
-    pub fn start(
+    /// Whatever `engine` returns beside the engine is passed on.
+    pub fn start<T>(
         &self,
-        engine: impl FnOnce(&PipelineInfo) -> Engine,
-    ) -> Result<Pipeline, HalError> {
+        engine: impl FnOnce(&PipelineInfo) -> (Engine, T),
+    ) -> Result<(Pipeline, T), HalError> {
         let Parts {
             tap,
             aggregate,
@@ -864,14 +865,16 @@ impl Hal {
         stats
             .cycle_nanos
             .store((cycle * 1e9) as u64, Ordering::Relaxed);
-        let io = IoProc::start(aggregate.id, engine(&info), stats.clone())?;
-        Ok(Pipeline {
+        let (engine, rest) = engine(&info);
+        let io = IoProc::start(aggregate.id, engine, stats.clone())?;
+        let pipeline = Pipeline {
             _io: io,
             _listeners: listeners,
             _aggregate: aggregate,
             _tap: tap,
             info,
-        })
+        };
+        Ok((pipeline, rest))
     }
 
     /// Whether `pipeline` still plays to the default output device at its
