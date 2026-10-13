@@ -1,6 +1,6 @@
-# Poom3D
+# Poor man's Boom 3D
 
-Poor man's Boom 3D
+Your Mac’s audio, on stage in a real concert hall.
 
 ## References
 
