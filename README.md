@@ -8,7 +8,8 @@ Needs macOS 14.2 or later and [Homebrew](https://brew.sh). It builds on your
 Mac, which takes a few minutes.
 
 ```sh
-brew install ashtonyoon/tap/poom3d
+brew tap ashtonyoon/tap
+brew install poom3d
 poom3d
 ```
 
