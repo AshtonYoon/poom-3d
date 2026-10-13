@@ -4,12 +4,8 @@ Your Mac’s audio, on stage in a real concert hall.
 
 ## Install
 
-Needs macOS 14.2 or later and [Homebrew](https://brew.sh). It builds on your
-Mac, which takes a few minutes.
-
 ```sh
-brew tap ashtonyoon/tap
-brew install poom3d
+brew install ashtonyoon/tap/poom3d
 poom3d
 ```
 
